@@ -1,21 +1,48 @@
 package tests_handler
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/xiaoshuwei/test/src/types/tests_types"
 	"testing"
+
+	validator "github.com/go-playground/validator/v10"
 )
 
 func TestTestsHandler(t *testing.T) {
-	s := &tests_types.TestStruct{
-		Name: "test",
-		Age:  18,
+	//defer func能否修改返回的error
+	err := testDeferFuncError()
+	fmt.Printf("err: %v\n", err)
+}
+
+func testDeferFuncError() (err error) {
+	defer func() {
+		err = fmt.Errorf("defer error")
+	}()
+	err = fmt.Errorf("return error")
+	return
+}
+
+func TestGinValidatorBindingStruct(t *testing.T) {
+	validate := validator.New()
+	validate.RegisterStructValidation(NameLengthValidation, T2{})
+
+	t2 := &T2{
+		Name: "shor123123t",
 	}
-	data, err := json.Marshal(s)
+
+	err := validate.Struct(t2)
 	if err != nil {
-		fmt.Printf("err: %v", err)
-		return
+		panic(err)
 	}
-	fmt.Printf("data: %s", string(data))
+}
+
+type T2 struct {
+	Name string `json:"name,omitempty"`
+}
+
+func NameLengthValidation(sl validator.StructLevel) {
+	t := sl.Current().Interface().(T2)
+
+	if len(t.Name) > 5 {
+		sl.ReportError(t.Name, "name", "Name", "namelength", "")
+	}
 }
