@@ -1,16 +1,20 @@
 package tests_handler
 
 import (
+	"database/sql"
 	"fmt"
-	"testing"
-
 	validator "github.com/go-playground/validator/v10"
+	_ "github.com/go-sql-driver/mysql"
+	"testing"
+	"time"
 )
 
 func TestTestsHandler(t *testing.T) {
-	//defer func能否修改返回的error
-	err := testDeferFuncError()
-	fmt.Printf("err: %v\n", err)
+	tn := time.Now()
+	t8 := tn.In(time.FixedZone("CST", 8*60*60))
+	t0 := tn.In(time.FixedZone("CST", 0))
+	fmt.Println(t8)
+	fmt.Println(t0)
 }
 
 func testDeferFuncError() (err error) {
@@ -45,4 +49,65 @@ func NameLengthValidation(sl validator.StructLevel) {
 	if len(t.Name) > 5 {
 		sl.ReportError(t.Name, "name", "Name", "namelength", "")
 	}
+}
+
+func TestDBConnection(t *testing.T) {
+	//"username:password@[protocol](address:port)/database"
+	db, err := sql.Open("mysql", "dump:Wa0YoRhmKLmm@tcp(127.0.0.1:6001)/") // Set database connection
+	if err != nil {
+		fmt.Printf("%v", err)
+	}
+	defer db.Close() //Close DB
+	err = db.Ping()  //Connect to DB
+	if err != nil {
+		fmt.Println("Database Connection Failed") //Connection failed
+		return
+	} else {
+		fmt.Println("Database Connection Succeed") //Connection succeed
+	}
+}
+
+func TestCrypto(t *testing.T) {
+	metaDBHost := "127.0.0.1"
+	metaDBPort := 8001
+	metaDBUserString := "username"
+	metaDBPasswordString := "password"
+	region := "us-west"
+	authFrontendLoginUrl := "127.0.0.1:8002"
+	configData := `metaDB:
+    host: ` + metaDBHost + `
+    port: ` + fmt.Sprintf("%d", metaDBPort) + `
+    username: ` + metaDBUserString + `
+    password: ` + metaDBPasswordString + `
+    database: mocloud_meta
+adminDB:
+	host: ` + metaDBHost + `
+    port: ` + fmt.Sprintf("%d", metaDBPort) + `
+    username: ` + metaDBUserString + `
+    password: ` + metaDBPasswordString + `
+    database: mocadmin
+log:
+    level: debug
+    format: json
+    filename:
+    maxSize:
+    maxDays:
+    MaxBackups:
+server:
+    host: localhost
+    port: 8001
+    certPath:
+    env: dev
+    accessTokenEffectiveTime: 24h
+    privateKeyFile: /etc/keys/private.key
+    publicKeyFile: /etc/keys/public.key
+    kubeconfigFile: /etc/kube/kubeconfig
+    region: ` + region + `
+    frontendLoginUrl: ` + authFrontendLoginUrl + `
+    priceUnit:
+      aliyun-cn-hangzhou-rmb:
+        cu: 500000
+        storage: 0.025
+`
+	fmt.Println(configData)
 }

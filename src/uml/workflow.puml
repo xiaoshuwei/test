@@ -1,0 +1,11 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+本地pulumi保存集群状态 -> 远端pulumi: 推送
+远端pulumi --> 远端pulumi: 检查当前集群状态和推送上来的状态是否一致，不一致则进行修改
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: another authentication Response
+@enduml
