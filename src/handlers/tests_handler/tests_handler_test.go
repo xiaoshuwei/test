@@ -1,7 +1,6 @@
 package tests_handler
 
 import (
-	"database/sql"
 	"fmt"
 	validator "github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
@@ -52,19 +51,8 @@ func NameLengthValidation(sl validator.StructLevel) {
 }
 
 func TestDBConnection(t *testing.T) {
-	//"username:password@[protocol](address:port)/database"
-	db, err := sql.Open("mysql", "dump:Wa0YoRhmKLmm@tcp(127.0.0.1:6001)/") // Set database connection
-	if err != nil {
-		fmt.Printf("%v", err)
-	}
-	defer db.Close() //Close DB
-	err = db.Ping()  //Connect to DB
-	if err != nil {
-		fmt.Println("Database Connection Failed") //Connection failed
-		return
-	} else {
-		fmt.Println("Database Connection Succeed") //Connection succeed
-	}
+	fmt.Println(time.Now())
+	fmt.Println(time.Now().UTC())
 }
 
 func TestCrypto(t *testing.T) {

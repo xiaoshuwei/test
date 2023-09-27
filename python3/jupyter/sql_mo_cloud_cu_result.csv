@@ -1,0 +1,3 @@
+﻿account,start_time,end_time,cu,type
+test,2023-09-28 00:14:00,2023-09-28 00:15:00,0.673,external_sql
+test,2023-09-28 00:14:00,2023-09-28 00:15:00,0.001,internal_sql
